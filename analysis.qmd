@@ -1,0 +1,19 @@
+---
+title: "Which College Majors Are Safest From AI"
+author: "James Holdaway"
+format: pdf
+---
+
+# Setup
+
+```{r}
+#| message: FALSE
+
+library(tidyverse)
+
+base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/"
+file_path <- "2026/2026-10-20/ai_salary_majors.csv"
+
+ai_salary_majors <- read_csv(paste0(base_url, file_path))
+```
+
