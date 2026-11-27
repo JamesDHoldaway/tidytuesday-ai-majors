@@ -20,6 +20,7 @@ A National Center for Education Statistics and Bureau of Labor Statistics crossw
 
 library(tidyverse)
 library(ggrepel)
+library(knitr)
 
 base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/"
 file_path <- "2026/2026-10-20/ai_salary_majors.csv"
@@ -31,31 +32,20 @@ ai_salary_majors <- read_csv(paste0(base_url, file_path))
 
 # Exploring the data 
 
+Across all majors, the salary ranges from about $10k to $107k. The median is about $41k and the mean is about $46k. 
+
+The AI exposure score runs from about -1.2 to 1.4 with around half of the majors falling between 0.68 and 1.19. Most majors have an above-average exposure compared with the average occupation, with a few below. This helps explain why the scatter plot is bunched on the right. 
+
+I've highlighted five majors. One is my own and the other four are ones that I have considered. These are all quantitative fields that I could see myself working in. 
+
 ```{r}
+#| eval: FALSE 
+
 glimpse(ai_salary_majors)
 summary(ai_salary_majors)
 ```
 ```{r}
-# finding specific majors
-ai_salary_majors |>
-  filter(str_detect(field_of_study, "Statistic")) |>
-  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
-
-ai_salary_majors |>
-  filter(str_detect(field_of_study, "Data Science")) |>
-  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
-
-ai_salary_majors |>
-  filter(str_detect(field_of_study, "Economic")) |>
-  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
-
-ai_salary_majors |>
-  filter(str_detect(field_of_study, "Finance")) |>
-  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
-
-ai_salary_majors |>
-  filter(str_detect(field_of_study, "Computer Science")) |>
-  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
+# marking specific majors of interest
 
 majors_of_interest <- ai_salary_majors |>
   filter(field_of_study %in% c(
@@ -67,8 +57,16 @@ majors_of_interest <- ai_salary_majors |>
   ))
 
 majors_of_interest |>
-  select(field_of_study, median_starting_salary, ai_exposure)
+  mutate(median_starting_salary = scales::dollar(median_starting_salary)) |>
+  select(field_of_study, median_starting_salary, ai_exposure) |>
+  kable(col.names = c("Major", "Starting Salary", "AI Exposure"))
 ```
+\newpage
+
+# Visualizing the Data 
+
+I was surprised to see the trend line relating median salary to AI exposure was almost completely flat. My five majors of interest are clustered on the far right either at or above the line. The fields that I've been considering are both above-average in pay and among the most AI-exposed. Because of this, I assumed that there was a strong relationship. However, across all 285 majors, that pattern doesn't hold. 
+
 ```{r}
 #| message: FALSE
 #| fig-width: 8
