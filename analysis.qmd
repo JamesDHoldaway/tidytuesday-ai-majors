@@ -1,5 +1,5 @@
 ---
-title: "Which College Majors Are Safest From AI"
+title: "Do high-AI-exposure majors earn higher starting salaries?"
 author: "James Holdaway"
 format: pdf
 ---
@@ -15,5 +15,45 @@ base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/
 file_path <- "2026/2026-10-20/ai_salary_majors.csv"
 
 ai_salary_majors <- read_csv(paste0(base_url, file_path))
+```
+
+# Exploring the data 
+
+```{r}
+glimpse(ai_salary_majors)
+summary(ai_salary_majors)
+```
+```{r}
+# finding specific majors
+ai_salary_majors |>
+  filter(str_detect(field_of_study, "Statistic")) |>
+  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
+
+ai_salary_majors |>
+  filter(str_detect(field_of_study, "Data Science")) |>
+  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
+
+ai_salary_majors |>
+  filter(str_detect(field_of_study, "Economic")) |>
+  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
+
+ai_salary_majors |>
+  filter(str_detect(field_of_study, "Finance")) |>
+  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
+
+ai_salary_majors |>
+  filter(str_detect(field_of_study, "Computer Science")) |>
+  select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
+```
+```{r}
+ai_salary_majors |>
+  ggplot(aes(x = ai_exposure, y = median_starting_salary)) +
+  geom_point(alpha = 0.5) + 
+  geom_smooth(method = lm) +
+  scale_y_continuous(labels = scales::dollar) +
+  labs(
+    x = "AI Exposure (standardized score)",
+    y = "Median Starting Salary ($)"
+  )
 ```
 
