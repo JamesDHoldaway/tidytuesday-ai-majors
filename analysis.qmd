@@ -2,13 +2,18 @@
 title: "AI Exposure and Starting Salaries"
 author: "James Holdaway"
 format: pdf
+bibliography: references.bib
 ---
 
 # Introduction 
 
 Do high-AI-exposure majors earn higher starting salaries? I want a career that works with AI, because I believe it's one of the biggest technological shifts of my lifetime. In this report, AI exposure measures how much a job's tasks overlap with what AI can do. It doesn't mean that the job will be replaced. As a Statistics major, I also looked at where Statistics and four related majors I've considered fall relative to other majors.
 
-# Setup
+# Data and Setup
+
+The salaries come from the U.S. Department of Education College Scorecard [-@scorecard], using bachelor's degree graduates' median earnings one year after graduation. The AI exposure comes from the AI Occupational Exposure (AIOE) index by @felten2021.
+
+A National Center for Education Statistics and Bureau of Labor Statistics crosswalk maps fields of study to the occupations their graduates tend to enter. A major's AI exposure score is the average across all occupations that it maps to. These scores are standardized, meaning that 0 is the average occupation, and each unit is one standard deviation. Only majors with both a salary and an exposure score were kept. This left 285 majors in the TidyTuesday data set (October 20, 2026), curated by Tony Galvan [-@tidytuesday2026]. 
 
 ```{r}
 #| message: FALSE
@@ -21,6 +26,8 @@ file_path <- "2026/2026-10-20/ai_salary_majors.csv"
 
 ai_salary_majors <- read_csv(paste0(base_url, file_path))
 ```
+
+\newpage
 
 # Exploring the data 
 
@@ -105,4 +112,6 @@ salary_model <- lm(median_starting_salary ~ ai_exposure, data = ai_salary_majors
 
 summary(salary_model)
 ```
-The correlation is nearly zero (r = 0.005), and the model's slope isn't significant (p = 0.94). From this data AI exposure explains pretty much none of the variation in starting salary. 
+The correlation is nearly zero (r = 0.005), and the model's slope isn't significant (p = 0.94). In this data, AI exposure explains almost none of the variation in starting salary. 
+
+# References
