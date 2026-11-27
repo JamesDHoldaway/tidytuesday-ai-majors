@@ -21,6 +21,8 @@ A National Center for Education Statistics and Bureau of Labor Statistics crossw
 library(tidyverse)
 library(ggrepel)
 library(knitr)
+library(broom)
+
 
 base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/"
 file_path <- "2026/2026-10-20/ai_salary_majors.csv"
@@ -65,8 +67,6 @@ majors_of_interest |>
 
 # Visualizing the Data 
 
-I was surprised to see the trend line relating median salary to AI exposure was almost completely flat. My five majors of interest are clustered on the far right either at or above the line. The fields that I've been considering are both above-average in pay and among the most AI-exposed. Because of this, I assumed that there was a strong relationship. However, across all 285 majors, that pattern doesn't hold. 
-
 ```{r}
 #| message: FALSE
 #| fig-width: 8
@@ -100,15 +100,23 @@ ai_salary_majors |>
                        color = field_of_study),
                    size = 3.5, show.legend = FALSE)
 ```
+I was surprised to see the trend line relating median salary to AI exposure was almost completely flat. My five majors of interest are clustered on the far right either at or above the line. The fields that I've been considering are both above-average in pay and among the most AI-exposed. Because of this, I assumed that there was a strong relationship. However, across all 285 majors, that pattern doesn't hold. 
+
+\newpage
+
 # Is there a relationship?
 
 ```{r}
 ai_salary_majors |>
-  summarize(r = cor(ai_exposure, median_starting_salary))
+  summarize(r = cor(ai_exposure, median_starting_salary)) |>
+  kable(digits =3, col.names = "Correlation (r)")
 
 salary_model <- lm(median_starting_salary ~ ai_exposure, data = ai_salary_majors)
 
-summary(salary_model)
+tidy(salary_model) |>
+  mutate(term = c("Intercept", "AI Exposure")) |>
+  kable(digits = 3,
+  col.names = c("Term", "Estimate", "Std. Error", "t", "p-value"))
 ```
 The correlation is nearly zero (r = 0.005), and the model's slope isn't significant (p = 0.94). In this data, AI exposure explains almost none of the variation in starting salary. 
 
@@ -117,5 +125,7 @@ The correlation is nearly zero (r = 0.005), and the model's slope isn't signific
 Across all 285 majors, higher AI exposure is not linked to a higher starting salary. This correlation is almost zero (r = 0.005). All five of the majors I highlighted are high-exposure and above average in pay. They range from $51,815 (Economics) to $89,651 (Math & CS). All are above the overall median of the 285 majors at about $41k. Majors with similar AI exposure such as Publishing (~$18k at 1.13) and Business Operations Support (~$17k at 0.99) pay far less, indicating other variables at play. Exposure to AI alone doesn't predict pay. However, within high-exposure fields, the field a student chooses matters a lot. This is encouraging for me because the fields that interest me let me work with AI and pay well. 
 
 This analysis is observational. Even where high exposure and high pay appear together, that doesn't mean that AI exposure causes higher pay. This data also explores pay one year after graduation, so it doesn't reflect long-term earnings. The sudden advancement of artificial intelligence is still rather new. As tools become more developed, this may shift. 
+
+\newpage
 
 # References
