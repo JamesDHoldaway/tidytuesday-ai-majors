@@ -1,8 +1,12 @@
 ---
-title: "Do high-AI-exposure majors earn higher starting salaries?"
+title: "AI Exposure and Starting Salaries"
 author: "James Holdaway"
 format: pdf
 ---
+
+# Introduction 
+
+Do high-AI-exposure majors earn higher starting salaries? I want a career that works with AI, because I believe it's one of the biggest technological shifts of my lifetime. In this report, AI exposure measures how much a job's tasks overlap with what AI can do. It doesn't mean that the job will be replaced. As a Statistics major, I also looked at where Statistics and four related majors I've considered fall relative to other majors.
 
 # Setup
 
