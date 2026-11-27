@@ -120,9 +120,11 @@ tidy(salary_model) |>
 ```
 The correlation is nearly zero (r = 0.005), and the model's slope isn't significant (p = 0.94). In this data, AI exposure explains almost none of the variation in starting salary. 
 
+\newpage
+
 # Does the type of AI matter?
 
-The data set splits AI exposure into language-modeling and image generation exposure. Overall exposure showed no relationship, but I am curious whether the two types of AI exposure behave differently.
+The data set splits AI exposure into language-modeling and image-generation exposure. Overall exposure showed no relationship, but I am curious whether the two types of AI exposure behave differently.
 
 ## Reshaping the data 
 
@@ -137,12 +139,61 @@ exposure_types <- ai_salary_majors |>
   ) |>
   mutate(exposure_type = if_else(exposure_type == "ai_exposure_language",
                                  "Language AI", "Image AI"))
+
+stats_types <- exposure_types |>
+  filter(field_of_study == "Statistics")
+```
+
+## Comparing the two types of AI Exposure
+
+```{r}
+#| message: FALSE
+
+exposure_types |>
+  group_by(exposure_type) |>
+  summarize(r = cor(exposure, median_starting_salary)) |>
+  kable(digits = 3, col.names = c("Exposure Type", "Correlation (r)"))
+```
+```{r}
+#| message: FALSE
+#| fig-width: 8
+#| fig-height: 4.5
+
+exposure_types |>
+  ggplot(aes(x = exposure, y = median_starting_salary)) +
+  geom_point(color = "gray70", alpha = 0.5) +
+  geom_smooth(method = lm, color = "gray30", fill = "gray85") +
+  geom_point(data = stats_types, color = "#CC0000", size = 3) +
+  facet_wrap(~ exposure_type) +
+  scale_y_continuous(labels = scales::dollar) +
+  labs(
+    title = "Salary vs. AI exposure, by type of AI",
+    subtitle = "Statistics highlighted in red",
+    x = "AI Exposure (standardized score)",
+    y = "Median Starting Salary ($)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+```{r}
+exposure_types |>
+  group_by(exposure_type) |>
+  summarize(
+    predicted = predict(lm(median_starting_salary ~ exposure),
+                        newdata = tibble(exposure = exposure[field_of_study == "Statistics"])),
+    actual = median_starting_salary[field_of_study == "Statistics"]
+  ) |>
+  mutate(across(c(predicted, actual), \(x) scales::dollar(x,    accuracy = 1))) |>
+  kable(digits = 0, col.names = c("Exposure Type", "Predicted Salary", "Statistics' Salary"))
 ```
 
 
+The picture changes when exposure is split by the type of AI. Image AI exposure has a moderate positive relationship with salary (r = 0.331), and language AI exposure has a weak negative one (r = -0.155). The two types of exposure pull in opposite directions, which may help explain why the combined score was flat. For image AI exposure, the trend line predicts about $52k at Statistics' exposure level. Statistics earns about $8k more than that. For language AI exposure, the line predicts about $44k. Statistics is about $16k above the line.  
+
 # Conclusion 
 
-Across all 285 majors, higher AI exposure is not linked to a higher starting salary. This correlation is almost zero (r = 0.005). All five of the majors I highlighted are high-exposure and above average in pay. They range from $51,815 (Economics) to $89,651 (Math & CS). All are above the overall median of the 285 majors at about $41k. Majors with similar AI exposure such as Publishing (~$18k at 1.13) and Business Operations Support (~$17k at 0.99) pay far less, indicating other variables at play. Exposure to AI alone doesn't predict pay. However, within high-exposure fields, the field a student chooses matters a lot. This is encouraging for me because the fields that interest me let me work with AI and pay well. 
+Across all 285 majors, higher AI exposure is not linked to a higher starting salary. The correlation is almost zero (r = 0.005). All five of the majors I highlighted are high-exposure and above average in pay. They range from $51,815 (Economics) to $89,651 (Math & CS). All are above the overall median of the 285 majors at about $41k. Majors with similar AI exposure such as Publishing (~$18k at 1.13) and Business Operations Support (~$17k at 0.99) pay far less, indicating other variables at play. Exposure to AI alone doesn't predict pay. The type of AI exposure appears to matter more than overall exposure. The faceted plots above suggest a positive correlation between image AI exposure and median salary, and a negative one for language AI exposure. Within high-exposure fields, the field a student chooses matters a lot. This is encouraging for me because the fields that interest me let me work with AI and pay well. 
 
 This analysis is observational. Even where high exposure and high pay appear together, that doesn't mean that AI exposure causes higher pay. This data also explores pay one year after graduation, so it doesn't reflect long-term earnings. The sudden advancement of artificial intelligence is still rather new. As tools become more developed, this may shift. 
 
