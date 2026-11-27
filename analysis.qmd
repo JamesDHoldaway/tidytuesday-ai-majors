@@ -10,6 +10,7 @@ format: pdf
 #| message: FALSE
 
 library(tidyverse)
+library(ggrepel)
 
 base_url <- "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/"
 file_path <- "2026/2026-10-20/ai_salary_majors.csv"
@@ -44,16 +45,49 @@ ai_salary_majors |>
 ai_salary_majors |>
   filter(str_detect(field_of_study, "Computer Science")) |>
   select(field_of_study, median_starting_salary, ai_exposure, ai_exposure_percentile)
+
+majors_of_interest <- ai_salary_majors |>
+  filter(field_of_study %in% c(
+    "Statistics",
+    "Computer Science",
+    "Economics",
+    "Finance and Financial Management Services",
+    "Mathematics and Computer Science"
+  ))
+
+majors_of_interest |>
+  select(field_of_study, median_starting_salary, ai_exposure)
 ```
 ```{r}
+#| message: FALSE
+#| fig-width: 8
+#| fig-height: 5
+
 ai_salary_majors |>
   ggplot(aes(x = ai_exposure, y = median_starting_salary)) +
-  geom_point(alpha = 0.5) + 
-  geom_smooth(method = lm) +
+  geom_point(color = "gray70", alpha = 0.5) + 
+  geom_smooth(method = lm, color = "gray30", fill = "gray85") +
+  geom_point(data = majors_of_interest, aes(color = field_of_study), size = 3) +
   scale_y_continuous(labels = scales::dollar) +
+  scale_color_manual(values = c(
+  "Statistics" = "#CC0000",
+  "Computer Science" = "#3D3D3D",
+  "Mathematics and Computer Science" = "#3D3D3D",
+  "Economics" = "#3D3D3D",
+  "Finance and Financial Management Services" = "#3D3D3D"
+  )) +
   labs(
+    title = "Do high-AI-exposure majors earn higher starting salaries?",
+    subtitle = paste("Each point is one of 285 majors.",
+                 "\nHighlighted: majors I'm considering"),
     x = "AI Exposure (standardized score)",
     y = "Median Starting Salary ($)"
-  )
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold")) +
+  geom_label_repel(data = majors_of_interest,
+                   aes(label = field_of_study,
+                       color = field_of_study),
+                   size = 3.5, show.legend = FALSE)
 ```
-
