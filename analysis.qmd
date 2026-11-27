@@ -91,3 +91,14 @@ ai_salary_majors |>
                        color = field_of_study),
                    size = 3.5, show.legend = FALSE)
 ```
+# Is there a relationship?
+
+```{r}
+ai_salary_majors |>
+  summarize(r = cor(ai_exposure, median_starting_salary))
+
+salary_model <- lm(median_starting_salary ~ ai_exposure, data = ai_salary_majors)
+
+summary(salary_model)
+```
+The correlation is nearly zero (r = 0.005), and the model's slope isn't significant (p = 0.94). From this data AI exposure explains pretty much none of the variation in starting salary. 
