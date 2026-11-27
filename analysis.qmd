@@ -120,6 +120,26 @@ tidy(salary_model) |>
 ```
 The correlation is nearly zero (r = 0.005), and the model's slope isn't significant (p = 0.94). In this data, AI exposure explains almost none of the variation in starting salary. 
 
+# Does the type of AI matter?
+
+The data set splits AI exposure into language-modeling and image generation exposure. Overall exposure showed no relationship, but I am curious whether the two types of AI exposure behave differently.
+
+## Reshaping the data 
+
+```{r}
+exposure_types <- ai_salary_majors |>
+  select(field_of_study, median_starting_salary,
+         ai_exposure_language, ai_exposure_image) |>
+  pivot_longer(
+    cols = c(ai_exposure_language, ai_exposure_image),
+    names_to = "exposure_type",
+    values_to = "exposure"
+  ) |>
+  mutate(exposure_type = if_else(exposure_type == "ai_exposure_language",
+                                 "Language AI", "Image AI"))
+```
+
+
 # Conclusion 
 
 Across all 285 majors, higher AI exposure is not linked to a higher starting salary. This correlation is almost zero (r = 0.005). All five of the majors I highlighted are high-exposure and above average in pay. They range from $51,815 (Economics) to $89,651 (Math & CS). All are above the overall median of the 285 majors at about $41k. Majors with similar AI exposure such as Publishing (~$18k at 1.13) and Business Operations Support (~$17k at 0.99) pay far less, indicating other variables at play. Exposure to AI alone doesn't predict pay. However, within high-exposure fields, the field a student chooses matters a lot. This is encouraging for me because the fields that interest me let me work with AI and pay well. 
